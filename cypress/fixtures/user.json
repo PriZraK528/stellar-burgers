@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "accessToken": "qwerty",
+  "refreshToken": "qwerty123456",
+  "user": {
+    "email": "ex@examplemail.com",
+    "name": "User"
+  }
+}
