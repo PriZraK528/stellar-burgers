@@ -1,37 +1,43 @@
 /// <reference types="cypress" />
-// ***********************************************
-// This example commands.ts shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-//
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
+// Добавляет ингредиент в конструктор по ID
+Cypress.Commands.add('addIngredient', (id: string) => {
+  cy.get(`[data-cy='${id}']`).children('button').click();
+});
+
+// Проверяет значение счётчика у ингредиента по ID
+Cypress.Commands.add('verifyCounter', (id: string, count: string | number) => {
+  cy.get(`[data-cy='${id}']`).find('.counter__num').should('have.text', String(count));
+});
+
+// Проверяет, что указанный текст (название ингредиента) присутствует в конструкторе
+Cypress.Commands.add('verifyConstructorContains', (text: string) => {
+  cy.get('[data-cy="constructor"]').contains(text).should('exist');
+});
+
+// Проверяет, что указанный текст (название ингредиента) отсутствует в конструкторе
+Cypress.Commands.add('verifyConstructorNotContains', (text: string) => {
+  cy.get('[data-cy="constructor"]').contains(text).should('not.exist');
+});
+
+// Открывает модальное окно ингредиента по ID и проверяет его по названию
+Cypress.Commands.add('openIngredientModal', (id: string, name: string) => {
+  cy.get(`[data-cy='${id}']`).children('a').click();
+  cy.get('#modals').contains(name).should('exist');
+});
+
+// Закрывает модальное окно по крестику
+Cypress.Commands.add('closeModal', () => {
+  cy.get('#modals').find('button').click();
+  cy.get('#modals').should('be.empty');
+});
+
+declare namespace Cypress {
+  interface Chainable<Subject = any> {
+    addIngredient(id: string): Chainable<Element>;
+    verifyCounter(id: string, expectedCount: number): Chainable<Element>;
+    verifyConstructorContains(text: string): Chainable<Element>;
+    verifyConstructorNotContains(text: string): Chainable<Element>;
+    openIngredientModal(id: string, text: string): Chainable<Element>;
+    closeModal(): Chainable<Element>;
+  }
+}
